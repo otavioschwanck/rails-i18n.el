@@ -30,6 +30,20 @@ Example of how to set the shortcuts:
 (map! :map web-mode-map "C-c C-i" 'rails-i18n-insert-no-cache) ;; Search refresh cache web-mode
 #+end_src
 
+* Customizing
+You can customize by setting this variables:
+
+| Variable                         | Description                             | Default                  |
+| rails-i18n-use-double-quotes     | Add double quotes instead single quotes | t                        |
+| rails-i18n-project-root-function |                                         | 'projectile-project-root |
+| rails-i18n-project-name-function |                                         | 'projectile-project-name |
+| rails-i18n-locales-directory     |                                         | "config/locales"         |
+| rails-i18n-locales-regexp        |                                         | "\\.yml$"                |
+| rails-i18n-separator             |                                         | ":       "               |
+
+Tip: you can set =rails-i18n-locales-regexp= to some language to improve performance.  Example value: "\\.en\\.yml$"
+
+
 * Do you like my work?  Please, buy me a coffee
 
 https://www.buymeacoffee.com/otavioschwanck
