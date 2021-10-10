@@ -5,7 +5,7 @@
 ;; Author: Otávio Schwanck dos Santos <otavioschwanck@gmail.com>
 ;; Keywords: tools languages
 ;; Version: 0.2
-;; Package-Requires: ((emacs "27.2") (dash "2.19.1"))
+;; Package-Requires: ((emacs "27.2") (yaml "0.1.0") (dash "2.19.1"))
 ;; Homepage: https://github.com/otavioschwanck/rails-i18n.el
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -35,12 +35,35 @@
 (require 'yaml)
 (require 'dash)
 
-(defvar rails-i18n-use-double-quotes nil "If t, use double quotes instead single-quotes.")
-(defvar rails-i18n-project-root-function 'projectile-project-root "Function used to get project root.")
-(defvar rails-i18n-project-name-function 'projectile-project-name "Function used to get project name.")
-(defvar rails-i18n-locales-directory "config/locales" "I18n locales folder.")
-(defvar rails-i18n-locales-regexp "\\.yml$" "Query to get the the yamls to i18n.")
-(defvar rails-i18n-separator ":      " "Query to get the the yamls to i18n.")
+(defgroup rails-i18n nil
+  "Search for and insert rails i18n."
+  :group 'tools
+  :group 'languages)
+
+(defcustom rails-i18n-use-double-quotes nil
+  "If t, use double quotes instead single-quotes."
+  :type 'boolean)
+
+(defcustom rails-i18n-project-root-function 'projectile-project-root
+  "Function used to get project root."
+  :type 'symbol)
+
+(defcustom rails-i18n-project-name-function 'projectile-project-name
+  "Function used to get project name."
+  :type 'symbol)
+
+(defcustom rails-i18n-locales-directory "config/locales"
+  "I18n locales folder."
+  :type 'string)
+
+(defcustom rails-i18n-locales-regexp "\\.yml$"
+  "Query to get the the yamls to i18n."
+  :type 'string)
+
+(defcustom rails-i18n-separator ":  "
+  "Query to get the the yamls to i18n."
+  :type 'string)
+
 (defvar rails-i18n-cache '() "Initialize the i18n cache.")
 (defvar rails-i18n-yaml-mode-hook 'yaml-mode-hook "Hook used to add rails-i18n cache upgrader.")
 
@@ -185,8 +208,11 @@
   "Add rails-i18n-cache to savehist."
   (add-to-list 'savehist-additional-variables 'rails-i18n-cache))
 
-(add-hook 'savehist-mode-hook #'rails-i18n--add-to-savehist)
-(add-hook rails-i18n-yaml-mode-hook #'rails-i18n--watch-rb)
+;;;###autoload
+(defun rails-i18n-global-mode ()
+  "Toggle cache hooks and watchs for rails-i18n."
+  (add-hook 'savehist-mode-hook #'rails-i18n--add-to-savehist)
+  (add-hook rails-i18n-yaml-mode-hook #'rails-i18n--watch-rb))
 
 (provide 'rails-i18n)
 ;;; rails-i18n.el ends here

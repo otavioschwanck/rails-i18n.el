@@ -9,7 +9,6 @@ Load =rails-i18n.el= in your personal configuration.
 
 ** MELPA
 Coming soon.
-*
 
 * Features
 - Search through all i18n on a rails project
@@ -22,6 +21,9 @@ Coming soon.
 Example of how to set the shortcuts:
 
 #+begin_src emacs-lisp
+;; Initialize cache and file watch
+(rails-i18n-global-mode)
+
 ;; On vanilla
 (define-key ruby-mode-map (kbd "C-c i") 'rails-i18n-insert-with-cache) ;; Search with cache on ruby mode
 (define-key ruby-mode-map (kbd "C-c C-i") 'rails-i18n-insert-no-cache) ;; Search refresh cache on ruby mode
@@ -31,8 +33,8 @@ Example of how to set the shortcuts:
 ;; On doom emacs
 (map! :map ruby-mode-map "C-c i" 'rails-i18n-insert-with-cache) ;; Search with cache on ruby mode
 (map! :map ruby-mode-map "C-c C-i" 'rails-i18n-insert-no-cache) ;; Search refresh cache on ruby modee
-(map! :map web-mode-map "C-c i" 'rails-i18n-insert-with-cache) ;; Search with cache on web-mode
-(map! :map web-mode-map "C-c C-i" 'rails-i18n-insert-no-cache) ;; Search refresh cache web-mode
+(map! :after web-mode :map web-mode-map "C-c i" 'rails-i18n-insert-with-cache) ;; Search with cache on web-mode
+(map! :after web-mode :map web-mode-map "C-c C-i" 'rails-i18n-insert-no-cache) ;; Search refresh cache web-mode
 #+end_src
 
 * Customizing
