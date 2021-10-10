@@ -141,7 +141,6 @@
   (when (string-match-p rails-i18n-locales-regexp (file-name-nondirectory (buffer-file-name)))
     (add-hook 'after-save-hook #'rails-i18n--upgrade-single-file-cache) 100 t))
 
-
 (defun rails-i18n--upgrade-cache-for (result)
   "Upgrade cache for just one project / file.  RESULT:  Texts to be upgraded."
   (let* ((currentI18n (cdr (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)))
