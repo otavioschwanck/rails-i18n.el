@@ -1,5 +1,3 @@
-#+TITLE: Readme
-
 * About
 Search and insert rails i18n using emacs in your code.
 
