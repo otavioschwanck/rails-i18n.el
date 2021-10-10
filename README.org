@@ -41,7 +41,7 @@ Example of how to set the shortcuts:
 You can customize by setting this variables:
 
 | Variable                         | Description                             | Default                  |
-| rails-i18n-use-double-quotes     | Add double quotes instead single quotes | t                        |
+| rails-i18n-use-double-quotes     | Add double quotes instead single quotes | nil                      |
 | rails-i18n-project-root-function | Function used to guess project root     | 'projectile-project-root |
 | rails-i18n-project-name-function | Function used to guess project name     | 'projectile-project-name |
 | rails-i18n-locales-directory     | Locales directory                       | "config/locales"         |
