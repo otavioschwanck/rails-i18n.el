@@ -1,7 +1,7 @@
 #+TITLE: Readme
 
 * About
-Search and insert rails routes using emacs in your code.
+Search and insert rails i18n using emacs in your code.
 
 [[file:demo.gif]]
 
