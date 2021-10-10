@@ -4,7 +4,7 @@
 
 ;; Author: Otávio Schwanck dos Santos <otavioschwanck@gmail.com>
 ;; Keywords: tools languages
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ((emacs "27.2") (yaml "0.1.0"))
 ;; Homepage: https://github.com/otavioschwanck/rails-i18n.el
 
@@ -37,6 +37,7 @@
 (defvar rails-i18n-locales-regexp "\\.yml$" "Query to get the the yamls to i18n.")
 (defvar rails-i18n-separator ":      " "Query to get the the yamls to i18n.")
 (defvar rails-i18n-cache '() "Initialize the i18n cache.")
+(defvar rails-i18n-yaml-mode-hook 'yaml-mode-hook "Hook used to add rails-i18n cache upgrader.")
 
 (defun rails-i18n--read-lines (filePath)
   "Return filePath's file content. FILEPATH: Path of yaml."
@@ -89,8 +90,7 @@
   "Set the cache values. VAL:  Value to set."
   (when (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)
     (setq rails-i18n-cache (remove (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache) rails-i18n-cache)))
-  (setq rails-i18n-cache (cons `(,(funcall rails-i18n-project-name-function) . ,val) rails-i18n-cache))
-  (add-to-list 'savehist-additional-variables 'rails-i18n-cache))
+  (setq rails-i18n-cache (cons `(,(funcall rails-i18n-project-name-function) . ,val) rails-i18n-cache)))
 
 (defun rails-i18n--parse-yamls ()
   "Return the parsed yaml list."
@@ -104,9 +104,10 @@
                     (rails-i18n--parse-yaml
                      []
                      parsed-file )) $result)
-           (message "Cannot read %s - error on parse." file))))
+           (message "[warning] Cannot read %s - error on parse. (keep calm, still loading the yamls.)"
+                    (file-name-nondirectory file)))))
      files)
-    (cl-remove-duplicates (flatten-list $result))))
+    (-distinct (flatten-list $result))))
 
 (defun rails-i18n--get-yaml-files ()
   "Find all i18n files."
@@ -135,7 +136,50 @@
           rails-i18n-separator
           (propertize (format "%s" string) 'face 'bold)))
 
-(add-to-list 'savehist-additional-variables 'rails-i18n-cache)
+(defun rails-i18n--watch-rb ()
+  "Watch if yaml file is saved, if its a i18n file, upgrade cache."
+  (when (string-match-p rails-i18n-locales-regexp (file-name-nondirectory (buffer-file-name)))
+    (add-hook 'after-save-hook #'rails-i18n--upgrade-single-file-cache) 100 t))
+
+
+(defun rails-i18n--upgrade-cache-for (result)
+  "Upgrade cache for just one project / file.  RESULT:  Texts to be upgraded."
+  (let* ((currentI18n (cdr (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)))
+         (cleanedI18n (rails-i18n--remove-old currentI18n result)))
+    (rplacd (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)
+            (-distinct (flatten-list (push result cleanedI18n))))))
+
+(defun rails-i18n--remove-old (currentI18n result)
+  "Remove old i18n and change to new. CURRENTI18N: i18n at moment, RESULT: new file i18ns parsed."
+  (mapcar
+   (lambda (element)
+     (when
+         (not (cl-member (nth 0 (split-string element rails-i18n-separator))
+                         (mapcar (lambda (oldElement) (nth 0 (split-string oldElement rails-i18n-separator))) result)
+                         :test #'string-match))
+       element))
+   currentI18n))
+
+(defun rails-i18n--upgrade-single-file-cache ()
+  "Upgrade rails-i18n when file is changed (when possible)."
+  (let* ((yaml (rails-i18n--read-lines (buffer-file-name)))
+         (hasCache (rails-i18n--get-cached))
+         ($result))
+    (if (and (eq (type-of yaml) 'hash-table) hasCache)
+        (progn
+          (push (flatten-list
+                 (rails-i18n--parse-yaml
+                  []
+                  yaml )) $result)
+          (rails-i18n--upgrade-cache-for (-distinct (flatten-list $result))))
+      (message "Rails i18n: Cache not found or cannot parse yaml."))))
+
+(defun rails-i18n--add-to-savehist ()
+  "Add rails-i18n-cache to savehist."
+  (add-to-list 'savehist-additional-variables 'rails-i18n-cache))
+
+(add-hook 'savehist-mode-hook #'rails-i18n--add-to-savehist)
+(add-hook rails-i18n-yaml-mode-hook #'rails-i18n--watch-rb)
 
 (provide 'rails-i18n)
 ;;; rails-i18n.el ends here

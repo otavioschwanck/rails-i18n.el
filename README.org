@@ -11,6 +11,13 @@ Load =rails-i18n.el= in your personal configuration.
 
 ** MELPA
 Coming soon.
+*
+
+* Features
+- Search through all i18n of a rails project
+- Insert i18n direct to the code, formatted, detecting if is on a view/helper or a class (use I18n. for class)
+- Cache (After the first search, the result will be save and persisted for all emacs sessions).
+- Auto upgrade cache when a i18n yaml file is changed (smart, just for the file changed, very fast).
 
 * Configuring
 
@@ -38,10 +45,10 @@ You can customize by setting this variables:
 | rails-i18n-project-root-function | Function used to guess project root     | 'projectile-project-root |
 | rails-i18n-project-name-function | Function used to guess project name     | 'projectile-project-name |
 | rails-i18n-locales-directory     | Locales directory                       | "config/locales"         |
-| rails-i18n-locales-regexp        | Regex to find yml                       | "\\.yml$"                |
+| rails-i18n-locales-regexp        | Regex to find yml                       | "\\\\.yml$"              |
 | rails-i18n-separator             | Separator to show i18n - text           | ":       "               |
 
-Tip: you can set =rails-i18n-locales-regexp= to some language to improve performance.  Example value: "\\.en\\.yml$"
+Tip: you can set =rails-i18n-locales-regexp= to some language to improve performance.  Example value: "\\\\.en\\\\.yml$"
 
 
 * Do you like my work?  Please, buy me a coffee
