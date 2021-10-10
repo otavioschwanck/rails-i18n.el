@@ -30,6 +30,10 @@
 
 ;;; Code:
 
+(require 'savehist)
+(require 'subr-x)
+(require 'yaml)
+
 (defvar rails-i18n-use-double-quotes nil "If t, use double quotes instead single-quotes.")
 (defvar rails-i18n-project-root-function 'projectile-project-root "Function used to get project root.")
 (defvar rails-i18n-project-name-function 'projectile-project-name "Function used to get project name.")
