@@ -1,5 +1,5 @@
 * About
-Search and insert rails i18n using emacs in your code.
+Search rails i18n using emacs and insert in your code.
 
 [[file:demo.gif]]
 
@@ -12,7 +12,7 @@ Coming soon.
 *
 
 * Features
-- Search through all i18n of a rails project
+- Search through all i18n on a rails project
 - Insert i18n direct to the code, formatted, detecting if is on a view/helper or a class (use I18n. for class)
 - Cache (After the first search, the result will be save and persisted for all emacs sessions).
 - Auto upgrade cache when a i18n yaml file is changed (smart, just for the file changed, very fast).
@@ -48,6 +48,15 @@ You can customize by setting this variables:
 
 Tip: you can set =rails-i18n-locales-regexp= to some language to improve performance.  Example value: "\\\\.en\\\\.yml$"
 
+* My other works:
+
+** Rails routes:
+https://github.com/otavioschwanck/rails-routes.el
+
+** My Personal Config (for rails)
+
+(Very complete, has videos + handbooks of how to use)
+https://github.com/otavioschwanck/doom-emacs-on-rails/
 
 * Do you like my work?  Please, buy me a coffee
 
