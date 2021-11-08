@@ -8,7 +8,7 @@ Search rails i18n using emacs and insert in your code.
 Load =rails-i18n.el= in your personal configuration.
 
 ** MELPA
-Coming soon.
+M-x package-install RET rails-i18n RET
 
 * Features
 - Search through all i18n on a rails project
