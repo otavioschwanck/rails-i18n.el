@@ -45,7 +45,7 @@
 
 (defcustom rails-i18n--cache-loaded nil
   "If t, means that rails i18n already loaded the cache."
-  :type 'string)
+  :type 'boolean)
 
 (defcustom rails-i18n-use-double-quotes nil
   "If t, use double quotes instead single-quotes."
