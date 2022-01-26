@@ -39,6 +39,14 @@
   :group 'tools
   :group 'languages)
 
+(defun rails-i18n--default-project-package ()
+  "Return the default project package."
+  (if (featurep 'projectile) 'projectile 'project))
+
+(defcustom rails-i18n-project-package (rails-i18n--default-project-package)
+  "Project package to access project functions."
+  :type 'symbol)
+
 (defcustom rails-i18n-cache-path (concat user-emacs-directory ".local/rails-i18n")
   "Where the cache will be saved."
   :type 'string)
@@ -73,6 +81,29 @@
 
 (defvar rails-i18n-cache '() "Initialize the i18n cache.")
 (defvar rails-i18n-yaml-mode-hook 'yaml-mode-hook "Hook used to add rails-i18n cache upgrader.")
+
+(defun rails-i18n-project-name-function ()
+  "Get the project name."
+  (cond
+   ((eq rails-i18n-project-package 'projectile) (when (fboundp 'projectile-project-name) (projectile-project-name)))
+   ((eq rails-i18n-project-package 'project) (rails-i18n--get-project-name-for-project))))
+
+(defun rails-i18n-project-root-function ()
+  "Get the project root."
+  (cond
+   ((eq rails-i18n-project-package 'projectile) (when (fboundp 'projectile-project-root) (projectile-project-root)))
+   ((eq rails-i18n-project-package 'project) (string-replace "~/"
+                                                          (concat (car (split-string
+                                                                (shell-command-to-string "echo $HOME") "\n")) "/")
+                                                          (when (fboundp 'project-root) (project-root (project-current)))))))
+
+(defun rails-i18n--get-project-name-for-project ()
+  "Return projects name for project."
+  (let* ((splitted-project-path (split-string (cdr (project-current)) "/"))
+         (splitted-length (length splitted-project-path))
+         (project-name (nth (- splitted-length 2) splitted-project-path)))
+    project-name))
+
 
 (defun rails-i18n--read-lines (filePath)
   "Return filePath's file content. FILEPATH: Path of yaml."
@@ -113,7 +144,8 @@
 
 ;;;###autoload
 (defun rails-i18n-insert-with-cache ()
-  "Search and insert the i18n, searching on cache.  If cache is nil, refresh the cache."
+  "Search and insert the i18n, searching on cache.
+If cache is nil, refresh the cache."
   (interactive)
   (rails-i18n--load-cache)
   (let ((cachedI18n (rails-i18n--get-cached)))
@@ -123,7 +155,7 @@
 
 (defun rails-i18n--get-cached ()
   "Get the cached routes if not exists."
-  (cdr (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)))
+  (cdr (assoc (rails-i18n-project-name-function) rails-i18n-cache)))
 
 (defun rails-i18n--insert-i18n (i18nString)
   "Insert the i18n on code. I18NSTRING: string to be inserted."
@@ -136,7 +168,9 @@
     (when hasArguments (forward-char -1) (insert ", "))))
 
 (defun rails-i18n--format-substring (i18nString ignoreClass)
-  "Format the substring depending of mode. IGNORECLASS: boolean taht indicates if I18n class was ignored. I18NSTRING: String to be inserted."
+  "Format the substring depending of mode.
+IGNORECLASS: boolean taht indicates if I18n class was ignored.
+I18NSTRING: String to be inserted."
   (let ((stringToBeInserted (nth 0 (split-string i18nString rails-i18n-separator))))
     (if
         ignoreClass
@@ -153,7 +187,7 @@
 (defun rails-i18n--controller-and-action-name ()
   "Current controller and action."
   (let*
-      ((withoutProjectName (replace-regexp-in-string (concat (funcall rails-i18n-project-root-function) "app/views") "" (buffer-file-name)))
+      ((withoutProjectName (replace-regexp-in-string (concat (rails-i18n-project-root-function) "app/views") "" (buffer-file-name)))
        (withoutUnderline (replace-regexp-in-string "/_" "/" withoutProjectName))
        (slashChanged (replace-regexp-in-string "/" "." withoutUnderline))
        (fixedString (string-join (butlast (split-string slashChanged "\\.") 2) ".")))
@@ -165,9 +199,9 @@
 
 (defun rails-i18n--set-cache (val)
   "Set the cache values. VAL:  Value to set."
-  (when (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)
-    (setq rails-i18n-cache (remove (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache) rails-i18n-cache)))
-  (setq rails-i18n-cache (cons `(,(funcall rails-i18n-project-name-function) . ,val) rails-i18n-cache))
+  (when (assoc (rails-i18n-project-name-function) rails-i18n-cache)
+    (setq rails-i18n-cache (remove (assoc (rails-i18n-project-name-function) rails-i18n-cache) rails-i18n-cache)))
+  (setq rails-i18n-cache (cons `(,(rails-i18n-project-name-function) . ,val) rails-i18n-cache))
   (rails-i18n--save-cache))
 
 (defun rails-i18n--parse-yamls ()
@@ -190,10 +224,11 @@
 (defun rails-i18n--get-yaml-files ()
   "Find all i18n files."
   (directory-files-recursively
-   (concat (funcall rails-i18n-project-root-function) rails-i18n-locales-directory) rails-i18n-locales-regexp))
+   (concat (rails-i18n-project-root-function) rails-i18n-locales-directory) rails-i18n-locales-regexp))
 
 (defun rails-i18n--parse-yaml (previousKey yamlHashTable)
-  "Parse the yaml into an single list.  PREVIOUSKEY: key to be mounted.  YAMLHASHTABLE:  Value to be parsed."
+  "Parse the yaml into an single list.
+PREVIOUSKEY: key to be mounted.  YAMLHASHTABLE:  Value to be parsed."
   (if (eq (type-of yamlHashTable) 'hash-table)
       (progn
         (let ($result)
@@ -208,7 +243,8 @@
     (rails-i18n--mount-string previousKey yamlHashTable)))
 
 (defun rails-i18n--mount-string (previousKey string)
-  "Create the string to be selected. PREVIOUSKEY: list of keys to mount. STRING: Value to the i18n."
+  "Create the string to be selected.
+PREVIOUSKEY: list of keys to mount. STRING: Value to the i18n."
   (concat "."
           (string-join (remove (nth 0 previousKey) previousKey) ".")
           rails-i18n-separator
@@ -224,13 +260,14 @@
 
 (defun rails-i18n--upgrade-cache-for (result)
   "Upgrade cache for just one project / file.  RESULT:  Texts to be upgraded."
-  (let* ((currentI18n (cdr (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)))
+  (let* ((currentI18n (cdr (assoc (rails-i18n-project-name-function) rails-i18n-cache)))
          (cleanedI18n (rails-i18n--remove-old currentI18n result)))
-    (rplacd (assoc (funcall rails-i18n-project-name-function) rails-i18n-cache)
+    (rplacd (assoc (rails-i18n-project-name-function) rails-i18n-cache)
             (-distinct (flatten-list (push result cleanedI18n))))))
 
 (defun rails-i18n--remove-old (currentI18n result)
-  "Remove old i18n and change to new. CURRENTI18N: i18n at moment, RESULT: new file i18ns parsed."
+  "Remove old i18n and change to new.
+CURRENTI18N: i18n at moment, RESULT: new file i18ns parsed."
   (mapcar
    (lambda (element)
      (when

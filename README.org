@@ -37,13 +37,12 @@ Example of how to set the shortcuts:
 * Customizing
 You can customize by setting this variables:
 
-| Variable                         | Description                             | Default                  |
-| rails-i18n-use-double-quotes     | Add double quotes instead single quotes | nil                      |
-| rails-i18n-project-root-function | Function used to guess project root     | 'projectile-project-root |
-| rails-i18n-project-name-function | Function used to guess project name     | 'projectile-project-name |
-| rails-i18n-locales-directory     | Locales directory                       | "config/locales"         |
-| rails-i18n-locales-regexp        | Regex to find yml                       | "\\\\.yml$"              |
-| rails-i18n-separator             | Separator to show i18n - text           | ":       "               |
+| Variable                     | Description                                                          | Default          |
+| rails-i18n-use-double-quotes | Add double quotes instead single quotes                              | nil              |
+| rails-i18n-project-package   | Package to use project related stuff (available: projectile project) | 'projectile      |
+| rails-i18n-locales-directory | Locales directory                                                    | "config/locales" |
+| rails-i18n-locales-regexp    | Regex to find yml                                                    | "\\\\.yml$"      |
+| rails-i18n-separator         | Separator to show i18n - text                                        | ":       "       |
 
 Tip: you can set =rails-i18n-locales-regexp= to some language to improve performance.  Example value: "\\\\.en\\\\.yml$"
 
